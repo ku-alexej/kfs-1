@@ -1,7 +1,8 @@
 CC      := gcc
 AS      := as
 LD      := ld
-GRUB_MKRESCUE := grub-mkrescue
+GRUB_MKRESCUE := $(shell command -v grub2-mkrescue 2>/dev/null || command -v grub-mkrescue 2>/dev/null)
+GRUB_MODULES ?= $(firstword $(wildcard /usr/lib/grub/i386-pc /usr/lib/grub2/i386-pc))
 QEMU    := qemu-system-i386
 
 # ---------------------------------------------------------------------------
@@ -64,9 +65,11 @@ $(KERNEL): $(OBJS) ft_linker.ld
 # ---------------------------------------------------------------------------
 
 iso: $(KERNEL)
+	@test -n "$(GRUB_MKRESCUE)" || { echo "Error: grub2-mkrescue or grub-mkrescue is required"; exit 1; }
+	@test -n "$(GRUB_MODULES)" || { echo "Error: GRUB i386-pc modules are missing; install grub2-pc-modules or set GRUB_MODULES=/path/to/i386-pc"; exit 1; }
 	@mkdir -p $(ISO_DIR)/boot/grub $(BUILD)
 	cp $(KERNEL) $(ISO_DIR)/boot/kernel.elf
-	$(GRUB_MKRESCUE) -o $(ISO) $(ISO_DIR)
+	$(GRUB_MKRESCUE) -d "$(GRUB_MODULES)" -o $(ISO) $(ISO_DIR)
 
 # ---------------------------------------------------------------------------
 # Run
@@ -82,7 +85,7 @@ run: iso
 check: $(KERNEL)
 	readelf -h $(KERNEL)
 	readelf -S $(KERNEL)
-	executable=$$(command -v grub-file 2>/dev/null) && $$executable --is-x86-multiboot $(KERNEL) || true
+	executable=$$(command -v grub2-file 2>/dev/null || command -v grub-file 2>/dev/null) && $$executable --is-x86-multiboot $(KERNEL) || true
 
 # ---------------------------------------------------------------------------
 # Clean
@@ -92,6 +95,6 @@ clean:
 	rm -rf $(BUILD)
 
 fclean: clean
-	rm -rf $(ISO_DIR)
+	rm -f $(ISO_DIR)/boot/kernel.elf
 
 re: fclean all

@@ -36,3 +36,20 @@
 - Helpers like printf / printk in order to print information / debug easily.
 - Handle keyboard entries + print them.
 - Handle different screens + keyboard shortcuts to switch between then.
+
+
+Download and extract the grub package locally without sudo:
+```bash
+mkdir -p "$HOME/.local/grub"
+cd "$HOME/.local/grub"
+
+dnf download --destdir . grub2-pc-modules
+rpm2cpio grub2-pc-modules-*.rpm | cpio -id
+```
+
+Then build and run
+```bash
+cd /home/akurochk/Documents/kfs-1
+make clean
+make run GRUB_MODULES="$HOME/.local/grub/usr/lib/grub/i386-pc"
+```
