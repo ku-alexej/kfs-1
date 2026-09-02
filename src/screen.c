@@ -100,7 +100,9 @@ void screen_put_char(char c)
     }
 
     if (cursor_y >= VGA_HEIGHT)
+	{
         screen_scroll();
+	}
 
 	screen_update_cursor();
 }
