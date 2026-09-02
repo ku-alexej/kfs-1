@@ -5,10 +5,16 @@
 static volatile unsigned short *const vga = (volatile unsigned short *)VGA_MEMORY;
 static size_t cursor_x = 0;
 static size_t cursor_y = 0;
+static unsigned char current_color = VGA_DEFAULT_COLOR;
 
 static unsigned short vga_entry(unsigned char c)
 {
-    return (unsigned short)c | ((unsigned short)VGA_COLOR << 8);
+    return (unsigned short)c | ((unsigned short)current_color << 8);
+}
+
+void screen_set_color(unsigned char color)
+{
+    current_color = color;
 }
 
 static void vga_outb(unsigned short port, unsigned char value)
@@ -72,6 +78,8 @@ void screen_clear(void)
 {
     size_t y;
     size_t x;
+
+	current_color = VGA_DEFAULT_COLOR;
 
     for (y = 0; y < VGA_HEIGHT; ++y)
         for (x = 0; x < VGA_WIDTH; ++x)
