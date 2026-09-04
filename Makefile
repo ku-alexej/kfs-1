@@ -30,10 +30,13 @@ ISO     := $(BUILD)/kfs_1.iso
 # Sources
 # ---------------------------------------------------------------------------
 
-C_SRCS  := src/kernel.c src/screen.c src/string.c
-C_OBJS  := $(C_SRCS:%.c=$(BUILD)/%.o)
-ASM_OBJS := $(BUILD)/src/boot.o
-OBJS    := $(ASM_OBJS) $(C_OBJS)
+C_SRCS		:= src/kernel.c \
+				src/screen.c \
+				src/string.c \
+				src/printk.c
+C_OBJS		:= $(C_SRCS:%.c=$(BUILD)/%.o)
+ASM_OBJS	:= $(BUILD)/src/boot.o
+OBJS		:= $(ASM_OBJS) $(C_OBJS)
 
 # ---------------------------------------------------------------------------
 # Targets

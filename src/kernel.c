@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include "multiboot.h"
 #include "screen.h"
+#include "printk.h"
 
 // Main function of the kernel
 void kernel_main(unsigned int multiboot_magic, unsigned int multiboot_info_address)
@@ -25,4 +26,5 @@ void kernel_main(unsigned int multiboot_magic, unsigned int multiboot_info_addre
 		screen_put_line("--------------------------------");
 	}
 	screen_set_color(VGA_DEFAULT_COLOR);
+	printk("my %cittle %s, %d, %u, %x, %%\n", 'l', "fox", -123231, 4200000000, 10);
 }
