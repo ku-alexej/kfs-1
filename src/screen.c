@@ -17,8 +17,11 @@ void screen_set_color(unsigned char color)
     current_color = color;
 }
 
+// port - where to send the byte
+// value - the byte to send
 static void vga_outb(unsigned short port, unsigned char value)
 {
+	// out - sends a byte to an I/O port.
     __asm__ volatile (
         ".intel_syntax noprefix\n"
         "out dx, al\n"
@@ -28,7 +31,15 @@ static void vga_outb(unsigned short port, unsigned char value)
     );
 }
 
-static void screen_enable_cursor(void)
+// VGA CRT Controller has two main ports.
+//     0x3D4 - command port to choose register VGA
+//     0x3D5 - write data to the register
+// Usually cursor has height 16:
+//     0u - start or top
+//     15u - end or bottom
+//     Yes, we can make differet cursors style: (14u:15u) - underscore cursor
+//     █ - block cursor
+static void screen_enable_block_cursor(void)
 {
     vga_outb(VGA_CRTC_COMMAND, VGA_CURSOR_START);
     vga_outb(VGA_CRTC_DATA, 0u);
@@ -39,11 +50,17 @@ static void screen_enable_cursor(void)
 
 static void screen_update_cursor(void)
 {
+	// 16 bits - position
+	// ex: position = 410 = 0x019A
+	// 00000001 10011010
+    // | HIGH | | LOW  |
     unsigned short position = (unsigned short)(cursor_y * VGA_WIDTH + cursor_x);
 
+	// set up first 8 bits of the cursor position into VGA_CURSOR_LOW
     vga_outb(VGA_CRTC_COMMAND, VGA_CURSOR_LOW);
     vga_outb(VGA_CRTC_DATA, (unsigned char)(position & 0xFFu));
 
+	// set up second 8 bits of the cursor position into VGA_CURSOR_HIGH
     vga_outb(VGA_CRTC_COMMAND, VGA_CURSOR_HIGH);
     vga_outb(VGA_CRTC_DATA, (unsigned char)((position >> 8) & 0xFFu));
 }
@@ -86,7 +103,7 @@ void screen_clear(void)
             vga[y * VGA_WIDTH + x] = vga_entry(' ');
 
     screen_set_cursor(0, 0);
-	screen_enable_cursor();
+	screen_enable_block_cursor();
 }
 
 void screen_put_char(char c)

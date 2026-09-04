@@ -9,12 +9,13 @@ QEMU    := qemu-system-i386
 # Compiler / assembler / linker flags
 # ---------------------------------------------------------------------------
 
-CFLAGS  := -m32 -ffreestanding -fno-builtin -fno-stack-protector \
-           -fno-pie -fno-asynchronous-unwind-tables -mno-mmx -mno-sse -mno-sse2 -msoft-float \
-           -nostdlib -nodefaultlibs \
-           -Wall -Wextra -Werror -std=c99 -Iinclude
-ASFLAGS := --32
-LDFLAGS := -m elf_i386 -T ft_linker.ld -nostdlib
+CFLAGS      := -m32 -ffreestanding -fno-builtin -fno-stack-protector \
+				-fno-pie -fno-asynchronous-unwind-tables -mno-mmx -mno-sse -mno-sse2 -msoft-float \
+				-nostdlib -nodefaultlibs \
+				-Wall -Wextra -Werror -std=c99 -Iinclude
+ASFLAGS     := --32
+LDFLAGS     := -m elf_i386 -T ft_linker.ld -nostdlib
+GRUBFLAGS   := --install-modules="multiboot configfile"
 
 # ---------------------------------------------------------------------------
 # Project directories
@@ -69,7 +70,7 @@ iso: $(KERNEL)
 	@test -n "$(GRUB_MODULES)" || { echo "Error: GRUB i386-pc modules are missing; install grub2-pc-modules or set GRUB_MODULES=/path/to/i386-pc"; exit 1; }
 	@mkdir -p $(ISO_DIR)/boot/grub $(BUILD)
 	cp $(KERNEL) $(ISO_DIR)/boot/kernel.elf
-	$(GRUB_MKRESCUE) -d "$(GRUB_MODULES)" -o $(ISO) $(ISO_DIR)
+	$(GRUB_MKRESCUE) -d "$(GRUB_MODULES)" $(GRUBFLAGS) -o $(ISO) $(ISO_DIR)
 
 # ---------------------------------------------------------------------------
 # Run

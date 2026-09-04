@@ -11,16 +11,23 @@
 // Physical address of the VGA text-mode video memory.
 // (colors are stored in the upper byte, 
 // characters in the lower byte)
+// example: VGA_MEMORY[0] = 0x0741;
+//     0x41 = 'A'
+//     0x07 = light grey on black background
 #define VGA_MEMORY 0xB8000u
 
 // VGA CRT Controller index/command I/O port.
+// (used to select the register to access)
 #define VGA_CRTC_COMMAND 0x3D4u
 // VGA CRT Controller data I/O port.
+// (used to read/write the selected register)
 #define VGA_CRTC_DATA    0x3D5u
+
 // CRT Controller register index for the cursor start scanline.
 #define VGA_CURSOR_HIGH  0x0Eu
 // CRT Controller register index for the cursor end scanline.
 #define VGA_CURSOR_LOW   0x0Fu
+
 // CRT Controller register index for cursor start and visibility settings.
 #define VGA_CURSOR_START 0x0Au
 // CRT Controller register index for cursor end and visibility settings.
